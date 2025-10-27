@@ -102,8 +102,12 @@ export default function HomePage() {
 
       const data: GenerationResponse = await res.json();
       setResponse(data);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unexpected error occurred');
+      }
     } finally {
       setLoading(false);
     }
@@ -118,7 +122,7 @@ export default function HomePage() {
       <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
         <Grid container spacing={3}>
           {/* Brand Selector */}
-          <Grid item xs={12}>
+          <Grid size={12}>
             <FormControl fullWidth>
               <InputLabel id="brand-select-label">Brand</InputLabel>
               <Select
@@ -135,7 +139,7 @@ export default function HomePage() {
           </Grid>
 
           {/* Channel Selector */}
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <FormControl fullWidth>
                 <InputLabel id="channel-select-label">Channel</InputLabel>
                 <Select
@@ -152,7 +156,7 @@ export default function HomePage() {
           </Grid>
           
           {/* Label/Reason Selector */}
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
              <FormControl fullWidth>
                 <InputLabel id="label-reason-select-label">Label/Reason</InputLabel>
                 <Select
@@ -175,7 +179,7 @@ export default function HomePage() {
           </Grid>
           
           {/* Operator Prompt */}
-          <Grid item xs={12}>
+          <Grid size={12}>
             <TextField
               fullWidth
               label="Optional Operator Prompt"
@@ -187,7 +191,7 @@ export default function HomePage() {
           </Grid>
           
           {/* Message Count */}
-          <Grid item xs={12}>
+          <Grid size={12}>
              <TextField
                fullWidth
                label="Number of Messages"
@@ -199,7 +203,7 @@ export default function HomePage() {
           </Grid>
           
           {/* Submit Button */}
-          <Grid item xs={12}>
+          <Grid size={12}>
             <Button
               type="submit"
               variant="contained"
