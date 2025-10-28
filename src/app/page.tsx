@@ -18,81 +18,10 @@ import {
   Box,
 } from '@mui/material';
 
-// --- Type Definitions ---
-interface GenerationRequest {
-  brand_context_path: string;
-  channel: string;
-  label_reason: {
-    label: string;
-    reason: string;
-  };
-  prompt?: string;
-  count: number;
-  language: string;
-}
-
-interface GeneratedMessage {
-  text: string;
-  channel: string;
-  valid: boolean;
-}
-
-interface GenerationResponse {
-  messages: GeneratedMessage[];
-}
-
-// --- Mock Data (as we can't read the backend's file system directly) ---
-const brands = [
-  { value: 'fullstack-challenge/data/brands/sushi_delight_mx.md', label: 'Sushi Delight MX' },
-  { value: 'fullstack-challenge/data/brands/mercadopago_business_ar.md', label: 'MercadoPago Business AR' },
-  { value: 'fullstack-challenge/data/brands/vetpro_chile_cl.md', label: 'VetPro Chile CL' },
-];
-
-const channels = ['whatsapp', 'push', 'email'];
-
-const labelReasons = [
-    { label: "new-user", reason: "welcome" },
-    { label: "recurrent-user", reason: "retention" },
-    { label: "recurrent-user", reason: "repeat-purchase" },
-    { label: "at-risk-user", reason: "re-activate" },
-    { label: "churned", reason: "re-activate" },
-    { label: "casual", reason: "promote" },
-];
-
-const languages = [
-  { value: 'en', label: 'English' },
-  { value: 'es', label: 'Spanish' },
-];
-
-const translations = {
-  en: {
-    title: 'Prompt Orchestrator UI',
-    brand: 'Brand',
-    channel: 'Channel',
-    labelReason: 'Label/Reason',
-    optionalPrompt: 'Optional Operator Prompt',
-    messageCount: 'Number of Messages',
-    generateButton: 'Generate Messages',
-    generatingButton: 'Generating...',
-    resultsTitle: 'Generated Messages',
-    validationPassed: 'Validation: Passed',
-    validationFailed: 'Validation: Failed',
-  },
-  es: {
-    title: 'UI del Orquestador de Prompts',
-    brand: 'Marca',
-    channel: 'Canal',
-    labelReason: 'Etiqueta/Razón',
-    optionalPrompt: 'Prompt Opcional del Operador',
-    messageCount: 'Número de Mensajes',
-    generateButton: 'Generar Mensajes',
-    generatingButton: 'Generando...',
-    resultsTitle: 'Mensajes Generados',
-    validationPassed: 'Validación: Aprobada',
-    validationFailed: 'Validación: Fallida',
-  },
-};
-
+import { brands, channels, labelReasons, languages } from './constants/data';
+import { translations } from './constants/translations';
+import { GenerationRequest, GenerationResponse } from './interfaces/types';
+import { generateMessages } from './services/api';
 
 export default function HomePage() {
   // --- State Management ---
@@ -126,20 +55,7 @@ export default function HomePage() {
     };
 
     try {
-      const res = await fetch('http://127.0.0.1:8000/generate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.detail || 'An unknown error occurred.');
-      }
-
-      const data: GenerationResponse = await res.json();
+      const data = await generateMessages(requestBody);
       setResponse(data);
     } catch (err: unknown) {
       if (err instanceof Error) {

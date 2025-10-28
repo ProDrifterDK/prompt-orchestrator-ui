@@ -1,0 +1,28 @@
+export const translations = {
+  en: {
+    title: 'Prompt Orchestrator UI',
+    brand: 'Brand',
+    channel: 'Channel',
+    labelReason: 'Label/Reason',
+    optionalPrompt: 'Optional Operator Prompt',
+    messageCount: 'Number of Messages',
+    generateButton: 'Generate Messages',
+    generatingButton: 'Generating...',
+    resultsTitle: 'Generated Messages',
+    validationPassed: 'Validation: Passed',
+    validationFailed: 'Validation: Failed',
+  },
+  es: {
+    title: 'UI del Orquestador de Prompts',
+    brand: 'Marca',
+    channel: 'Canal',
+    labelReason: 'Etiqueta/Razón',
+    optionalPrompt: 'Prompt Opcional del Operador',
+    messageCount: 'Número de Mensajes',
+    generateButton: 'Generar Mensajes',
+    generatingButton: 'Generando...',
+    resultsTitle: 'Mensajes Generados',
+    validationPassed: 'Validación: Aprobada',
+    validationFailed: 'Validación: Fallida',
+  },
+};
