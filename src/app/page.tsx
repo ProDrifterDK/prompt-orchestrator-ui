@@ -28,6 +28,7 @@ interface GenerationRequest {
   };
   prompt?: string;
   count: number;
+  language: string;
 }
 
 interface GeneratedMessage {
@@ -58,6 +59,40 @@ const labelReasons = [
     { label: "casual", reason: "promote" },
 ];
 
+const languages = [
+  { value: 'en', label: 'English' },
+  { value: 'es', label: 'Spanish' },
+];
+
+const translations = {
+  en: {
+    title: 'Prompt Orchestrator UI',
+    brand: 'Brand',
+    channel: 'Channel',
+    labelReason: 'Label/Reason',
+    optionalPrompt: 'Optional Operator Prompt',
+    messageCount: 'Number of Messages',
+    generateButton: 'Generate Messages',
+    generatingButton: 'Generating...',
+    resultsTitle: 'Generated Messages',
+    validationPassed: 'Validation: Passed',
+    validationFailed: 'Validation: Failed',
+  },
+  es: {
+    title: 'UI del Orquestador de Prompts',
+    brand: 'Marca',
+    channel: 'Canal',
+    labelReason: 'Etiqueta/Razón',
+    optionalPrompt: 'Prompt Opcional del Operador',
+    messageCount: 'Número de Mensajes',
+    generateButton: 'Generar Mensajes',
+    generatingButton: 'Generando...',
+    resultsTitle: 'Mensajes Generados',
+    validationPassed: 'Validación: Aprobada',
+    validationFailed: 'Validación: Fallida',
+  },
+};
+
 
 export default function HomePage() {
   // --- State Management ---
@@ -66,10 +101,13 @@ export default function HomePage() {
   const [labelReason, setLabelReason] = useState(labelReasons[0]);
   const [prompt, setPrompt] = useState('');
   const [count, setCount] = useState(1);
+  const [language, setLanguage] = useState(languages[0].value);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [response, setResponse] = useState<GenerationResponse | null>(null);
+
+  const t = translations[language as keyof typeof translations];
 
   // --- API Call Handler ---
   const handleSubmit = async (event: React.FormEvent) => {
@@ -84,6 +122,7 @@ export default function HomePage() {
       label_reason: labelReason,
       prompt: prompt || undefined,
       count,
+      language,
     };
 
     try {
@@ -117,18 +156,35 @@ export default function HomePage() {
   return (
     <Container maxWidth="md" sx={{ mt: 4 }}>
       <Typography variant="h4" component="h1" gutterBottom>
-        Prompt Orchestrator UI
+        {t.title}
       </Typography>
       <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
         <Grid container spacing={3}>
+          {/* Language Selector */}
+          <Grid size={12}>
+            <FormControl fullWidth>
+              <InputLabel id="language-select-label">Language</InputLabel>
+              <Select
+                labelId="language-select-label"
+                value={language}
+                label="Language"
+                onChange={(e) => setLanguage(e.target.value)}
+              >
+                {languages.map((lang) => (
+                  <MenuItem key={lang.value} value={lang.value}>{lang.label}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+
           {/* Brand Selector */}
           <Grid size={12}>
             <FormControl fullWidth>
-              <InputLabel id="brand-select-label">Brand</InputLabel>
+              <InputLabel id="brand-select-label">{t.brand}</InputLabel>
               <Select
                 labelId="brand-select-label"
                 value={brand}
-                label="Brand"
+                label={t.brand}
                 onChange={(e) => setBrand(e.target.value)}
               >
                 {brands.map((b) => (
@@ -141,40 +197,40 @@ export default function HomePage() {
           {/* Channel Selector */}
           <Grid size={{ xs: 12, sm: 6 }}>
             <FormControl fullWidth>
-                <InputLabel id="channel-select-label">Channel</InputLabel>
-                <Select
-                    labelId="channel-select-label"
-                    value={channel}
-                    label="Channel"
-                    onChange={(e) => setChannel(e.target.value)}
-                >
-                    {channels.map((c) => (
-                    <MenuItem key={c} value={c}>{c}</MenuItem>
-                    ))}
-                </Select>
+              <InputLabel id="channel-select-label">{t.channel}</InputLabel>
+              <Select
+                labelId="channel-select-label"
+                value={channel}
+                label={t.channel}
+                onChange={(e) => setChannel(e.target.value)}
+              >
+                {channels.map((c) => (
+                  <MenuItem key={c} value={c}>{c}</MenuItem>
+                ))}
+              </Select>
             </FormControl>
           </Grid>
           
           {/* Label/Reason Selector */}
           <Grid size={{ xs: 12, sm: 6 }}>
-             <FormControl fullWidth>
-                <InputLabel id="label-reason-select-label">Label/Reason</InputLabel>
-                <Select
-                    labelId="label-reason-select-label"
-                    value={`${labelReason.label}-${labelReason.reason}`}
-                    label="Label/Reason"
-                    onChange={(e) => {
-                        const [label, reason] = e.target.value.split('-');
-                        const selected = labelReasons.find(lr => lr.label === label && lr.reason === reason);
-                        if(selected) setLabelReason(selected);
-                    }}
-                >
-                    {labelReasons.map((lr) => (
-                    <MenuItem key={`${lr.label}-${lr.reason}`} value={`${lr.label}-${lr.reason}`}>
-                        {`${lr.label} (${lr.reason})`}
-                    </MenuItem>
-                    ))}
-                </Select>
+            <FormControl fullWidth>
+              <InputLabel id="label-reason-select-label">{t.labelReason}</InputLabel>
+              <Select
+                labelId="label-reason-select-label"
+                value={`${labelReason.label}-${labelReason.reason}`}
+                label={t.labelReason}
+                onChange={(e) => {
+                  const [label, reason] = e.target.value.split('-');
+                  const selected = labelReasons.find(lr => lr.label === label && lr.reason === reason);
+                  if(selected) setLabelReason(selected);
+                }}
+              >
+                {labelReasons.map((lr) => (
+                  <MenuItem key={`${lr.label}-${lr.reason}`} value={`${lr.label}-${lr.reason}`}>
+                    {`${lr.label} (${lr.reason})`}
+                  </MenuItem>
+                ))}
+              </Select>
             </FormControl>
           </Grid>
           
@@ -182,7 +238,7 @@ export default function HomePage() {
           <Grid size={12}>
             <TextField
               fullWidth
-              label="Optional Operator Prompt"
+              label={t.optionalPrompt}
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               multiline
@@ -192,14 +248,14 @@ export default function HomePage() {
           
           {/* Message Count */}
           <Grid size={12}>
-             <TextField
-               fullWidth
-               label="Number of Messages"
-               type="number"
-               value={count}
-               onChange={(e) => setCount(parseInt(e.target.value, 10))}
-               InputProps={{ inputProps: { min: 1, max: 5 } }}
-             />
+            <TextField
+              fullWidth
+              label={t.messageCount}
+              type="number"
+              value={count}
+              onChange={(e) => setCount(parseInt(e.target.value, 10))}
+              InputProps={{ inputProps: { min: 1, max: 5 } }}
+            />
           </Grid>
           
           {/* Submit Button */}
@@ -211,7 +267,7 @@ export default function HomePage() {
               disabled={loading}
               fullWidth
             >
-              {loading ? <CircularProgress size={24} /> : 'Generate Messages'}
+              {loading ? <CircularProgress size={24} /> : t.generateButton}
             </Button>
           </Grid>
         </Grid>
@@ -223,7 +279,7 @@ export default function HomePage() {
       {response && (
         <Box sx={{ mt: 4 }}>
           <Typography variant="h5" gutterBottom>
-            Generated Messages
+            {t.resultsTitle}
           </Typography>
           {response.messages.map((msg, index) => (
             <Card key={index} sx={{ mb: 2 }} variant="outlined">
@@ -232,10 +288,10 @@ export default function HomePage() {
                   color={msg.valid ? 'text.primary' : 'text.disabled'}
                   sx={{ whiteSpace: 'pre-wrap' }}
                 >
-                    {msg.text}
+                  {msg.text}
                 </Typography>
                 <Alert severity={msg.valid ? 'success' : 'warning'} sx={{ mt: 1 }}>
-                  {`Channel: ${msg.channel} - Validation: ${msg.valid ? 'Passed' : 'Failed'}`}
+                  {`${t.channel}: ${msg.channel} - ${msg.valid ? t.validationPassed : t.validationFailed}`}
                 </Alert>
               </CardContent>
             </Card>
